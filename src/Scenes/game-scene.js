@@ -1,4 +1,5 @@
 import Paddle from "../Features/paddle";
+import Ball from "../Features/ball";
 
 export default class GameScene extends Phaser.Scene {
     constructor(config) {
@@ -13,6 +14,7 @@ export default class GameScene extends Phaser.Scene {
         this.load.image("background", "assets/Backgrounds/final_01.png");
         this.load.image("paddle", "assets/main_paddle.png");
         this.load.image("ball", "assets/ball.png");
+        this.load.image("red_ball", "assets/red_ball.png");
 
         this.load.image("blue_full", "assets/Blue_Brick/blue_brick_full.png");
         this.load.image("blue_mid", "assets/Blue_Brick/blue_brick_mid.png");
@@ -42,13 +44,18 @@ export default class GameScene extends Phaser.Scene {
     create(){
         this.add.image(0, 0, "background").setOrigin(0);
         this.player = new Paddle(this, this.config.width / 2, 450, "yellow_full");
-        // this.ball = new Ball(this);
-        // this.physics.add.collider(this.bird, this.ball, this.gameOver, null, this);
-
+        this.ball = new Ball(this, this.config.width / 2, 420, "red_ball");
+        this.physics.add.collider(this.player, this.ball, this.changeVelocity, null, this);
     }
 
     update(){
+        if(this.ball.body.touching.down){
+            this.ball.velY = this.ball.velY * -1;
+        }
+    }
 
+    changeVelocity(){
+        this.ball.velX *= -1;
     }
 
     gameOver(){

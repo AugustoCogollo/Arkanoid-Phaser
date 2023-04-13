@@ -6,17 +6,18 @@ export default class Paddle extends Phaser.GameObjects.Sprite {
         this.scene = scene;
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        scene.input.keyboard.on("keydown-A", this.moveLeft, this);
-        scene.input.keyboard.on("keydown-D", this.moveRight, this);
+        scene.input.keyboard.on("keydown", this.move, this);
         scene.input.keyboard.on("keyup", this.resetSpeed, this);
+        this.setScale(2, 1);
+        this.body.immovable = true;
+        this.body.setCollideWorldBounds(true);
     }
 
-    moveLeft(){
-        this.body.velocity.x = -HORIZONTAL_VELOCITY;
-    }
-
-    moveRight(){
-        this.body.velocity.x = HORIZONTAL_VELOCITY;
+    move(){
+        if(event.keyCode === Phaser.Input.Keyboard.KeyCodes.A || event.keyCode === Phaser.Input.Keyboard.KeyCodes.LEFT)
+            this.body.velocity.x = -HORIZONTAL_VELOCITY;
+        if(event.keyCode === Phaser.Input.Keyboard.KeyCodes.D || event.keyCode === Phaser.Input.Keyboard.KeyCodes.RIGHT)
+            this.body.velocity.x = HORIZONTAL_VELOCITY;
     }
 
     resetSpeed(){
