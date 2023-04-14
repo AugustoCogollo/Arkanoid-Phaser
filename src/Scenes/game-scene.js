@@ -13,6 +13,12 @@ export default class GameScene extends Phaser.Scene {
         //This is just the text that displays the player's lifes 
         this.lifeScore = null;
         this.gameOverText = null;
+
+        this.hit_player_ball_sound = null;
+        this.loselife_sound = null;
+        this.hit_player_1_sound = null;
+        this.hit_player_2_sound = null;
+        this.hit_player_3_sound = null;
     }
 
     //Awake
@@ -47,6 +53,12 @@ export default class GameScene extends Phaser.Scene {
         this.load.image("yellow_low", "assets/Yellow_Brick/yellow_brick_low.png");
 
         this.load.bitmapFont("tl_font", 'assets/Fonts/Teletactile_file_0.png', 'assets/Fonts/Teletactile_file.fnt');
+
+        this.load.audio("hit_player_ball", "assets/Audio/Arkanoid_SFX_(1).wav");
+        this.load.audio("hit_lose_life", "assets/Audio/Arkanoid_SFX_(3).wav");
+        this.load.audio("hit_player_1", "assets/Audio/Arkanoid_SFX_(6).wav");
+        this.load.audio("hit_player_2", "assets/Audio/Arkanoid_SFX_(7).wav");
+        this.load.audio("hit_player_3", "assets/Audio/Arkanoid_SFX_(8).wav");
     }
 
     create(){
@@ -65,13 +77,29 @@ export default class GameScene extends Phaser.Scene {
         this.gameOverText.setCenterAlign();
         this.gameOverText.visible = false;
 
-        this.physics.add.collider(this.player, this.ball, this.changeVelocity, null, this);
+        this.hit_player_ball_sound = this.sound.add("hit_player_ball");
+        this.loselife_sound = this.sound.add("hit_lose_life");
+        this.hit_player_1_sound = this.sound.add("hit_player_1");
+        this.hit_player_2_sound = this.sound.add("hit_player_2");
+        this.hit_player_3_sound = this.sound.add("hit_player_3");
+
+        this.physics.add.collider(this.player, this.ball, this.ballHitPlayer, null, this);
         this.physics.add.collider(this.ball, this.gameOverBar, this.gameOver, null, this);
 
         this.input.keyboard.on("keydown-R", function(){
             console.log("restart scene");
             this.scene.restart();
         }, this);
+
+        this.physics.world.on('worldbounds', (body, up, down, left, right) =>
+        {
+            const { gameObject } = body;
+
+            if (up) { this.hit_player_ball_sound.play(); }
+            else if (down) { this.hit_player_ball_sound.play(); }
+            else if (left) { this.hit_player_ball_sound.play(); }
+            else if (right) { this.hit_player_ball_sound.play(); }
+        });
     }
 
     update(){
@@ -79,11 +107,24 @@ export default class GameScene extends Phaser.Scene {
         this.score.text = `SCORE: ${this.player.points.toFixed(0)}`;
     }
 
+    ballHitPlayer(){
+        var randNum = Phaser.Math.Between(0, 10);
+        console.log(randNum);
+        if(randNum <= 3)
+            this.hit_player_1_sound.play();
+        if(randNum > 3 && randNum <= 7);
+            this.hit_player_2_sound.play();
+        if(randNum > 7)
+            this.hit_player_3_sound.play();
+    }
+
     gameOver(){
         if(this.player.lifes > 0){
             this.player.lifes -= 1;
             console.log("Player lost a life");
             console.log("Remaining lifes: " + this.player.lifes);
+            this.loselife_sound.play();
+            
         }
         if(this.player.lifes == 0){
             this.player.canMove = false;

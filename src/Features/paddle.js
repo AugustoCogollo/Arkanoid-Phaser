@@ -13,9 +13,9 @@ export default class Paddle extends Phaser.GameObjects.Sprite {
         this.body.setCollideWorldBounds(true);
 
         this.points = 0;
-        this.lifes = 1 ;
+        this.lifes = 3;
         this.canMove = true;
-
+        
         this.body.offset.y = 10;
     }
 
