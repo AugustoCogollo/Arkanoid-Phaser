@@ -6,14 +6,22 @@ export default class Ball extends Phaser.GameObjects.Sprite {
         this.scene = scene;
         scene.add.existing(this);
         scene.physics.add.existing(this);
+
         this.body.setCollideWorldBounds(true, 1, 1, true);
         this.body.onWorldBounds = true;
         this.body.setBounce(1);
         this.body.setCircle(5);
         
-        this.velX = INITIAL_VELOCITY;
-        this.velY = INITIAL_VELOCITY;
+        this.randXValue = Phaser.Math.Between(1, 4);
+        this.randXDirection =  this.randXValue > 2? 1 : -1;
+        this.velX = INITIAL_VELOCITY * this.randXDirection;
+
+        this.randYValue = Phaser.Math.Between(1, 4);
+        this.randYDirection = this.randYValue > 2? 1 : -1;
+        this.velY = INITIAL_VELOCITY * this.randYDirection;
+
         this.body.setVelocity(this.velX, this.velY);
+
         this.body.offset.x = 10;
         this.body.offset.y = 10;
         
