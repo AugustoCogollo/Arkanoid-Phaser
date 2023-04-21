@@ -1,4 +1,4 @@
-const HORIZONTAL_VELOCITY = 300;
+const HORIZONTAL_VELOCITY = 500;
 
 export default class Paddle extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, texture){

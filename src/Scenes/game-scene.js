@@ -4,6 +4,7 @@ import GameOverBar from "../Features/gameoverBar";
 import { Game } from "phaser";
 import Score from "../Features/score";
 import soundManager from "../Features/soundManager";
+import BrickLine from "../Features/brickLine";
 
 const BACKGROUND_IMAGE_KEY = "background";
 const PADDLE_IMAGE_KEY = "paddle";
@@ -50,9 +51,20 @@ export default class GameScene extends Phaser.Scene {
         this.player = null;
         this.ball = null;
         this.score = null;
-        //This is just the text that displays the player's lifes 
-        this.lifeScore = null;
         this.gameOverText = null;
+
+        this.sounds = null;
+        this.layers = {
+            background: null,
+            game: null,
+            ui: null
+        }
+
+        this.redBricks = null;
+        this.blueBricks = null;
+        this.greenBricks = null;
+        this.yellowBricks = null;
+        this.orangeBricks = null;
 
         this.hit_wall_sound = null;
         this.loselife_sound = null;
@@ -106,21 +118,62 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create(){
-        this.add.image(0, 0, BACKGROUND_IMAGE_KEY).setOrigin(0);
+
+        this.layers.background = this.add.layer();
+        this.layers.game = this.add.layer();
+        this.layers.ui = this.add.layer();
+
+        var starredBackground = this.add.image(0, 0, BACKGROUND_IMAGE_KEY).setOrigin(0);
+        this.layers.background.add(starredBackground);
+
         this.player = new Paddle(this, this.config.width / 2, 450, PADDLE_IMAGE_KEY);
+        this.layers.game.add(this.player);
         this.ball = new Ball(this, this.config.width / 2, 420, BALL_RED_IMAGE_KEY);
-        this.score = new Score(this, this.config.width / 2, 32, TELETACTILE_FONT_KEY);
+        this.layers.game.add(this.ball);
+        this.score = new Score(this, this.config.width / 2, 32, TELETACTILE_FONT_KEY, this.layers.ui);
         this.sounds = new soundManager(this);
+
+        this.redBricks = new BrickLine(this, 80, 96, 64, 0, 30, BRICK_RED_FULL_KEY, this.layers.game);
+        this.blueBricks = new BrickLine(this, 80, 128, 64, 0, 20, BRICK_BLUE_FULL_KEY, this.layers.game);
+        this.greenBricks = new BrickLine(this, 80, 160, 64, 0, 10, BRICK_GREEN_FULL_KEY, this.layers.game);
+        this.yellowBricks = new BrickLine(this, 80, 192, 64, 0, 10, BRICK_YELLOW_FULL_KEY, this.layers.game);
+        this.orangeBricks = new BrickLine(this, 80, 224, 64, 0, 5, BRICK_ORANGE_FULL_KEY, this.layers.game);
         
         this.gameOverText = this.add.bitmapText(this.config.width / 2 - 250, this.config.height / 2, TELETACTILE_FONT_KEY, 'GAME OVER\n\nPress R to restart');
         this.gameOverText.setCenterAlign();
         this.gameOverText.visible = false;
+        this.layers.ui.add(this.gameOverText);
 
         this.physics.add.collider(this.player, this.ball, this.ballCollidesWithPlayer, null, this);
+        //Red bricks
+        this.physics.add.collider(this.ball, this.redBricks.getGroup(), (ball, brick) =>{
+            this.hitBrick(ball, brick);
+            this.score.addScore(this.redBricks.score);
+        }, null, this);
+        //Blue bricks
+        this.physics.add.collider(this.ball, this.blueBricks.getGroup(), (ball, brick) =>{
+            this.hitBrick(ball, brick);
+            this.score.addScore(this.blueBricks.score);
+        }, null, this);
+        //Green bricks
+        this.physics.add.collider(this.ball, this.greenBricks.getGroup(), (ball, brick) =>{
+            this.hitBrick(ball, brick);
+            this.score.addScore(this.greenBricks.score);
+        }, null, this);
+        //Yellow Bricks
+        this.physics.add.collider(this.ball, this.yellowBricks.getGroup(), (ball, brick) =>{
+            this.hitBrick(ball, brick);
+            this.score.addScore(this.yellowBricks.score);
+        }, null, this);
+        //Orange Bricks
+        this.physics.add.collider(this.ball, this.orangeBricks.getGroup(), (ball, brick) => {
+            this.hitBrick(ball, brick);
+            this.score.addScore(this.orangeBricks.score);
+        }, null, this);
 
         this.input.keyboard.on("keydown-R", function(){
             this.scene.restart();
-        }, this);
+        }, this);   
 
         this.physics.world.on('worldbounds', (body, up, down, left, right) =>
         {
@@ -137,6 +190,11 @@ export default class GameScene extends Phaser.Scene {
 
     }
 
+    hitBrick(ball, brick){
+        brick.destroy();
+        this.sounds.ballHitBrick();
+    }
+
     ballCollidesWithPlayer(){
         this.sounds.ballHitPlayer();
     }
@@ -151,6 +209,7 @@ export default class GameScene extends Phaser.Scene {
             this.player.canMove = false;
             this.ball.reset();
             this.gameOverText.visible = true;
+            this.score.checkHighScore();
         }
     }
 }

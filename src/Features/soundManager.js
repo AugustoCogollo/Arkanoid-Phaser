@@ -22,7 +22,7 @@ export default class soundManager {
     ballHitBrick(){
         var randNum = Phaser.Math.Between(0, 10);
         if(randNum <= 3)
-            this.hit_player_ball.play();
+            this.hit_brick_sound_2.play();
         if(randNum > 4)
             this.hit_brick_sound_1.play();
     }

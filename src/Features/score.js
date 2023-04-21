@@ -3,7 +3,7 @@ const HIGH_SCORE_LABEL = "High Score\n ";
 const HIGH_SCORE_SAVE_KEY = "high_score";
 
 export default class Score {
-    constructor(scene, x, y, font) {
+    constructor(scene, x, y, font, layer) {
         this.scene = scene;
         this.currentScoreValue = 0;
 
@@ -17,11 +17,14 @@ export default class Score {
         this.highScoreText = scene.add.bitmapText(x,y, font, HIGH_SCORE_LABEL + this.highScoreValue);
         this.highScoreText.setCenterAlign();
         this.highScoreText.setScale(0.5);
+
+        //layer.add(this.currentScoreText);
+        //layer.add(this.highScoreText);
     }
 
-    addScore(){
-        this.currentScoreValue ++;
-        this.currentScoreText.setText("Score: " + this.currentScoreValue);
+    addScore(score){
+        this.currentScoreValue += score;
+        this.currentScoreText.setText(SCORE_LABEL + this.currentScoreValue);
     }
 
     checkHighScore(){

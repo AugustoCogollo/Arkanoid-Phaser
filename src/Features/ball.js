@@ -1,4 +1,4 @@
-const INITIAL_VELOCITY = 200;
+const INITIAL_VELOCITY = 300;
 
 export default class Ball extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, texture){
